@@ -15,7 +15,6 @@ LASER_GENERATION_INTERVAL = 0.2
 PLAYER = glob.glob('player/*')
 METEOR = glob.glob('meteor/*')
 LASER = glob.glob('laser/*')
-print(PLAYER)
 
 
 class Entity(arcade.Sprite):
