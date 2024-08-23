@@ -1,7 +1,8 @@
 import arcade
 import arcade.gui
-from constants import *
 import game
+from constants import *
+
 
 
 
@@ -25,7 +26,9 @@ class MainView(arcade.View):
 
         @start_button.event('on_click')
         def on_click_start_button(event):
-            pass
+            main_view = game.MyGame()
+            main_view.setup()
+            self.window.show_view(main_view)
 
         @settings_button.event('on_click')
         def on_click_settings_button(event):
@@ -43,7 +46,7 @@ class MainView(arcade.View):
                 child=self.b_v_box))
 
     def on_show_view(self):
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
+        arcade.set_background_color((4, 10, 20))
         self.manager.enable()
 
     def on_hide_view(self):
@@ -83,7 +86,7 @@ class MenuView(arcade.View):
         self.manager.disable()
 
     def on_show_view(self):
-        arcade.set_background_color(arcade.color.DARK_BLUE_GRAY)
+        arcade.set_background_color((4, 10, 20))
 
         self.manager.enable()
 
@@ -92,7 +95,7 @@ class MenuView(arcade.View):
         self.manager.draw()
 
 
-class MyGame(arcade.Window):
+class MenuWindow(arcade.Window):
 
     # создание окна
     def __init__(self, window_width=WINDOW_WIDTH, window_height=WINDOW_HEIGHT, window_title=WINDOW_TITLE):
@@ -100,7 +103,7 @@ class MyGame(arcade.Window):
 
 
 def main():
-    window = MyGame()
+    window = MenuWindow()
     main_view = MainView()
     window.show_view(main_view)
     arcade.run()

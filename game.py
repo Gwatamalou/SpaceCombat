@@ -14,23 +14,25 @@ class Entity(arcade.Sprite):
         if bottom: self.sprites.bottom = bottom
 
 
-class MyGame(arcade.Window):
+class MyGame(arcade.View):
 
     def __init__(self):
-        super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT, WINDOW_TITLE)
+        super().__init__()
 
         self.player = None
         self.scene = None
         self.player_list = []
         self.meteor_list = []
         self.laser_list = []
+        self.star_list = []
         self.physics_engine = None
         self.last_laser_time = 0
-        arcade.set_background_color(arcade.color.CHARCOAL)
+        arcade.set_background_color((4, 10, 20))
 
     def setup(self):
         self.scene = arcade.Scene()
 
+        self.scene.add_sprite_list('Star', use_spatial_hash=True)
         self.scene.add_sprite_list('Player')
         self.scene.add_sprite_list('Meteor', use_spatial_hash=True)
         self.scene.add_sprite_list('Laser', use_spatial_hash=True)
@@ -38,6 +40,7 @@ class MyGame(arcade.Window):
         self.player_list.extend(PLAYER)
         self.meteor_list.extend(METEOR)
         self.laser_list.extend(LASER)
+        self.star_list.extend(STAR)
 
         self.player_setup()
 
@@ -64,12 +67,19 @@ class MyGame(arcade.Window):
         if key == arcade.key.RIGHT or key == arcade.key.D:
             self.player.sprites.change_x = 0
 
+    def generate_star(self):
+        star_sprite = Entity(self.star_list[random.randrange(0, len(self.star_list) - 1)],
+                                  center_x=random.randint(0, 600),
+                                  center_y=850,
+                                  change_y=-(15))
+        self.scene.add_sprite('Star', star_sprite.sprites)
+
     def generate_laser(self):
         laser  = Entity(self.laser_list[0],
                              center_x=self.player.sprites.center_x,
                              change_y=LASER_SPEAD,
                              bottom=self.player.sprites.top)
-        self.scene.add_sprite('Laser', laser .sprites)
+        self.scene.add_sprite('Laser', laser.sprites)
 
     def generate_meteor(self):
         meteor_sprite = Entity(self.meteor_list[random.randrange(0, len(self.meteor_list) - 1)],
@@ -79,7 +89,7 @@ class MyGame(arcade.Window):
                                change_x=random.randint(-3, 3))
         self.scene.add_sprite('Meteor', meteor_sprite.sprites)
 
-    def check_collision(self):
+    def dell_entity(self):
         for laser in self.scene['Laser']:
             hit_list = arcade.check_for_collision_with_list(laser, self.scene['Meteor'])
             if hit_list:
@@ -87,9 +97,14 @@ class MyGame(arcade.Window):
             for meteor_sprite in hit_list:
                 meteor_sprite.remove_from_sprite_lists()
             if laser.bottom > 800: laser.remove_from_sprite_lists()
+
         for meteor_sprite in self.scene['Meteor']:
             if meteor_sprite.top < 0:
                 meteor_sprite.remove_from_sprite_lists()
+
+        for star_sprite in self.scene['Star']:
+            if star_sprite.top < 0:
+                star_sprite.remove_from_sprite_lists()
 
     def on_update(self, delta_time):
         self.scene.update()
@@ -100,17 +115,10 @@ class MyGame(arcade.Window):
             self.generate_laser()
             self.last_laser_time = 0
 
-        if random.random() < 0.25:
+        if random.random() < 0.15:
             self.generate_meteor()
 
-        self.check_collision()
+        if random.random() < 0.5:
+            self.generate_star()
 
-
-def main():
-    window = MyGame()
-    window.setup()
-    arcade.run()
-
-
-if __name__ == '__main__':
-    main()
+        self.dell_entity()
